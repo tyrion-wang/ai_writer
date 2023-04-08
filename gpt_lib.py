@@ -1,87 +1,99 @@
 import openai
 import json
+import os
 
-def set_openai_key(key):
+def set_openai_key():
     """
     设置OpenAI API密钥
     """
-    openai.api_key = key
+    openai.api_key = os.environ.get('OPENAI_API_KEY')
 
-def gpt3_turbo(prompt, model, temperature=0.5, max_tokens=2048, n=1):
+
+def create_completion(prompt, model, temperature=0.5, max_tokens=1024, n=1, stop=None, presence_penalty=0.0,
+                      frequency_penalty=0.0, echo=False):
     """
-    使用GPT-3.5-turbo模型生成文本
+    使用GPT-3.5-Turbo模型生成文本。
 
-    prompt: 输入的文本
-    model: 要使用的模型的名称或ID
-    temperature: 温度参数，控制生成文本的随机性
-    max_tokens: 最大令牌数，控制生成文本的长度
-    n: 生成文本的数量
+    Args:
+        prompt (str): 模型生成文本的起始语句。
+        model (str): 使用的模型名称。
+        temperature (float): 控制随机性的温度值。默认值为0.5。
+        max_tokens (int): 生成文本的最大长度。默认值为1024。
+        n (int): 生成多少个响应。默认值为1。
+        stop (str): 用于停止生成的文本的标记符。默认值为None。
+        presence_penalty (float): 控制生成文本中是否存在特定单词的罚分。默认值为0.0。
+        frequency_penalty (float): 控制生成文本中特定单词的使用频率的罚分。默认值为0.0。
+        echo (bool): 是否将用户的输入添加到生成的文本中。默认值为False。
+
+    Returns:
+        str: 生成的文本响应。
     """
-
+    prompt = f"{prompt.strip()}{{}}"
+    messages = [{"type": "input", "text": prompt}]
+    if echo:
+        messages.append({"type": "input", "text": "{0}"})
     response = openai.Completion.create(
-      engine=model,
-      prompt=prompt,
-      max_tokens=max_tokens,
-      n=n,
-      temperature=temperature
+        engine=model,
+        prompt=prompt,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        n=n,
+        stop=stop,
+        presence_penalty=presence_penalty,
+        frequency_penalty=frequency_penalty,
+        model=model,
+        messages=messages,
     )
+    return response.choices[0].text.strip()
 
-    if response['choices']:
-        return response['choices'][0]['text'].strip()
-    else:
-        return ''
 
-def get_models():
+def list_models():
     """
-    获取可用的GPT-3模型列表
-    """
-    models = openai.Model.list()
-    return [model.id for model in models['data']]
+    列出当前支持的所有模型名称。
 
-def create_model(name, model_type='text', language='en', max_tokens=2048, temperature=0.5):
+    Returns:
+        list: 所有模型名称的列表。
     """
-    创建一个新的GPT-3模型
-    """
-    model = openai.Model.create(
-      id=name,
-      model_type=model_type,
-      language=language,
-      max_tokens=max_tokens,
-      temperature=temperature
-    )
-    return model.id
+    models = []
+    for model in openai.Model.list():
+        models.append(model.id)
+    return models
 
-def delete_model(name):
-    """
-    删除一个GPT-3模型
-    """
-    try:
-        openai.Model.delete(name)
-        return True
-    except:
-        return False
 
-def get_model_details(name):
+def get_model_info(model):
     """
-    获取一个GPT-3模型的详细信息
-    """
-    try:
-        model = openai.Model.retrieve(name)
-        return json.loads(str(model))
-    except:
-        return {}
+    获取指定模型的详细信息。
 
-def update_model(name, max_tokens=None, temperature=None):
+    Args:
+        model (str): 模型名称。
+
+    Returns:
+        dict: 包含模型详细信息的字典。
     """
-    更新一个GPT-3模型的参数
+    return openai.Model.retrieve(model).to_dict()
+
+
+def list_engines():
     """
-    try:
-        model = openai.Model.retrieve(name)
-        if max_tokens:
-            model.max_tokens = max_tokens
-        if temperature:
-            model.temperature = temperature
-        model.save()
-        return True
-    except:
-        return False
+    列出当前支持的所有引擎名称。
+
+    Returns:
+        list: 所有引擎名称的列表。
+    """
+    engines = []
+    for engine in openai.Engine.list():
+        engines.append(engine.id)
+    return engines
+
+
+def get_engine_info(engine):
+    """
+    获取指定引擎的详细信息。
+
+    Args:
+        engine (str): 引擎名称。
+
+    Returns:
+        dict: 包含引擎详细信息的字典。
+    """
+    return openai.Engine.retrieve(engine).to_dict()
