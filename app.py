@@ -2,10 +2,10 @@ from flask import Flask, render_template, request, jsonify
 import openai
 import os
 import json
+import gpt_lib
 
 # 配置openai的API Key
-openai.api_key = os.environ.get('OPENAI_API_KEY')
-
+gpt_lib.set_openai_key(os.environ.get('OPENAI_API_KEY'))
 # 初始化Flask
 app = Flask(__name__)
 
