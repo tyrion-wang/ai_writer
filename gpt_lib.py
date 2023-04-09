@@ -1,6 +1,12 @@
 import openai
 import json
 import os
+import logging
+import time
+
+chat_model = "gpt-3.5-turbo"
+edit_model = "text-davinci-edit-001"
+
 
 def set_openai_key():
     """
@@ -8,9 +14,28 @@ def set_openai_key():
     """
     openai.api_key = os.environ.get('OPENAI_API_KEY')
 
+def edit(input, instruction, temperature):
+    """
+        使用edit方法生成结果，主要用于文本的改写。
 
-def create_completion(prompt, model, temperature=0.5, max_tokens=1024, n=1, stop=None, presence_penalty=0.0,
-                      frequency_penalty=0.0, echo=False):
+        Args:
+            input (str): 需要改写的文本。
+            instruction (str): 改写建议。
+            temperature(num): 随机程度。
+        Returns:
+            str: 生成的文本响应。
+    """
+    response = openai.Edit.create(
+        model=edit_model,
+        input=input,
+        temperature=temperature,
+        instruction=instruction
+    )
+    return response.choices[0].text.strip()
+
+
+
+def chat(input, instruction, temperature):
     """
     使用GPT-3.5-Turbo模型生成文本。
 
@@ -18,82 +43,45 @@ def create_completion(prompt, model, temperature=0.5, max_tokens=1024, n=1, stop
         prompt (str): 模型生成文本的起始语句。
         model (str): 使用的模型名称。
         temperature (float): 控制随机性的温度值。默认值为0.5。
-        max_tokens (int): 生成文本的最大长度。默认值为1024。
-        n (int): 生成多少个响应。默认值为1。
-        stop (str): 用于停止生成的文本的标记符。默认值为None。
-        presence_penalty (float): 控制生成文本中是否存在特定单词的罚分。默认值为0.0。
-        frequency_penalty (float): 控制生成文本中特定单词的使用频率的罚分。默认值为0.0。
-        echo (bool): 是否将用户的输入添加到生成的文本中。默认值为False。
 
     Returns:
         str: 生成的文本响应。
     """
-    prompt = f"{prompt.strip()}{{}}"
-    messages = [{"type": "input", "text": prompt}]
-    if echo:
-        messages.append({"type": "input", "text": "{0}"})
-    response = openai.Completion.create(
-        engine=model,
-        prompt=prompt,
+    start_time = time.time()
+    # logging.info(f"开始请求OPEN AI API:{start_time}")
+    response = openai.ChatCompletion.create(
+        model=chat_model,
         temperature=temperature,
-        max_tokens=max_tokens,
-        n=n,
-        stop=stop,
-        presence_penalty=presence_penalty,
-        frequency_penalty=frequency_penalty,
-        model=model,
-        messages=messages,
+        stream=False,
+        messages=[
+            {"role": "user", "content": f"{instruction}:{input}"}
+        ]
     )
-    return response.choices[0].text.strip()
 
+    end_time = time.time()
+    logging.info(f"结束请求OPEN AI API耗时：{end_time-start_time}")
+    return response.choices[0].message.content.strip()
 
-def list_models():
+def chat_stream(input, instruction, temperature):
     """
-    列出当前支持的所有模型名称。
-
-    Returns:
-        list: 所有模型名称的列表。
-    """
-    models = []
-    for model in openai.Model.list():
-        models.append(model.id)
-    return models
-
-
-def get_model_info(model):
-    """
-    获取指定模型的详细信息。
+    使用GPT-3.5-Turbo模型生成文本。
 
     Args:
-        model (str): 模型名称。
+        prompt (str): 模型生成文本的起始语句。
+        model (str): 使用的模型名称。
+        temperature (float): 控制随机性的温度值。默认值为0.5。
 
     Returns:
-        dict: 包含模型详细信息的字典。
+        str: 生成的文本响应。
     """
-    return openai.Model.retrieve(model).to_dict()
-
-
-def list_engines():
-    """
-    列出当前支持的所有引擎名称。
-
-    Returns:
-        list: 所有引擎名称的列表。
-    """
-    engines = []
-    for engine in openai.Engine.list():
-        engines.append(engine.id)
-    return engines
-
-
-def get_engine_info(engine):
-    """
-    获取指定引擎的详细信息。
-
-    Args:
-        engine (str): 引擎名称。
-
-    Returns:
-        dict: 包含引擎详细信息的字典。
-    """
-    return openai.Engine.retrieve(engine).to_dict()
+    for chunk in openai.ChatCompletion.create(
+            model=chat_model,
+            temperature=temperature,
+            stream=True,
+            messages=[
+                {"role": "user", "content": f"{instruction}:{input}"}
+            ],
+    ):
+        content = chunk["choices"][0].get("delta", {}).get("content")
+        if content is not None:
+            print(content, end='')
