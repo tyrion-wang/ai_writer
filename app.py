@@ -14,7 +14,7 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
 logging.basicConfig(level=logging.DEBUG)
-#logging.disable()
+# logging.disable()
 
 # 定义首页
 @app.route('/')
