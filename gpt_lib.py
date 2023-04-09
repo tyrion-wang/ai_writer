@@ -62,7 +62,7 @@ def chat(input, instruction, temperature):
     logging.info(f"结束请求OPEN AI API耗时：{end_time-start_time}")
     return response.choices[0].message.content.strip()
 
-def chat_stream(input, instruction, temperature):
+def chat_stream(input, instruction, temperature, socketio):
     """
     使用GPT-3.5-Turbo模型生成文本。
 
@@ -84,4 +84,5 @@ def chat_stream(input, instruction, temperature):
     ):
         content = chunk["choices"][0].get("delta", {}).get("content")
         if content is not None:
+            socketio.emit('my response', content)
             print(content, end='')
