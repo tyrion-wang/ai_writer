@@ -32,10 +32,11 @@ def transcribe():
     temperature = 1.0 - float(similarity) / 10.0
     #transcription = gpt_lib.chat(text, "围绕这个命题，生成一个800字的作文：", temperature)
     # transcription = gpt_lib.chat(text, "总结这段文本，10个字以内：", temperature)
+    #gpt_lib.chat_stream(text, "围绕这个命题，生成一个800字的作文：", temperature, socketio)
     gpt_lib.chat_stream(text, "总结这段文本，10个字以内：", temperature, socketio)
-    transcription = "123"
+    # transcription = "123"
     # 返回json格式的结果
-    return jsonify({'transcription': transcription.strip()})
+    # return jsonify({'transcription': transcription.strip()})
 
 
 

@@ -65,26 +65,25 @@
   <input id="message" type="text" placeholder="Enter message">
   <button id="send">Send</button>
 </form>
+
+
+
 <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
 <script src="//code.jquery.com/jquery-1.11.1.js"></script>
 <script type="text/javascript">
-  var socket = io.connect('http://' + document.domain + ':' + location.port);
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-  socket.on('my response', function(data) {
-    $('#messages1').append(data);
-  });
+      socket.on('my response', function(data) {
+        $('#transcription').append(data);
+      });
 
-  $(function() {
-    $('form').on('submit', function(event) {
-      socket.emit('my event', $('#message').val());
-      $('#message').val('').focus();
-      event.preventDefault();
-    });
-  });
-</script>
-
-
-<script>
+      $(function() {
+        $('form').on('submit', function(event) {
+          socket.emit('my event', $('#message').val());
+          $('#message').val('').focus();
+          event.preventDefault();
+        });
+      });
     function transcribe() {
         // 获取用户输入的文字和相似度
         var text = document.getElementById('text').value;
