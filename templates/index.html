@@ -72,6 +72,7 @@
 <script src="//code.jquery.com/jquery-1.11.1.js"></script>
 <script type="text/javascript">
     var socket = io.connect('http://' + document.domain + ':' + location.port);
+    console.error('http://' + document.domain + ':' + location.port)
 
       socket.on('my response', function(data) {
         $('#transcription').append(data);
