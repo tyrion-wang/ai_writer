@@ -40,10 +40,10 @@ def transcribe():
 
 
 
-# @socketio.on('my event')
-# def handle_my_custom_event(data):
-#     print('received data: ' + str(data))
-#     emit('my response', data, broadcast=True)
+@socketio.on('my event')
+def handle_my_custom_event(data):
+    print('received data: ' + str(data))
+    emit('my response', data, broadcast=True)
 
 if __name__ == '__main__':
     app.run(debug=True)
