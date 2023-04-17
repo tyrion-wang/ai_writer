@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.DEBUG)
 # 定义首页
 @app.route('/')
 def index():
-    return render_template('test.html')
+    return render_template('index.html')
 
 
 # 定义转写函数
