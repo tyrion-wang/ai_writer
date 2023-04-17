@@ -4,14 +4,14 @@ import os
 import json
 import gpt_lib
 import logging
-from flask_socketio import SocketIO, emit
+# from flask_socketio import SocketIO, emit
 
 # 配置openai的API Key
 gpt_lib.set_openai_key()
 # 初始化Flask
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app)
+# app.config['SECRET_KEY'] = 'secret!'
+# socketio = SocketIO(app)
 
 logging.basicConfig(level=logging.DEBUG)
 # logging.disable()
@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.DEBUG)
 # 定义首页
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('test.html')
 
 
 # 定义转写函数
@@ -40,10 +40,10 @@ def transcribe():
 
 
 
-@socketio.on('my event')
-def handle_my_custom_event(data):
-    print('received data: ' + str(data))
-    emit('my response', data, broadcast=True)
+# @socketio.on('my event')
+# def handle_my_custom_event(data):
+#     print('received data: ' + str(data))
+#     emit('my response', data, broadcast=True)
 
 if __name__ == '__main__':
     app.run(debug=True)
