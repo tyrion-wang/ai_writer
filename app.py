@@ -4,14 +4,14 @@ import os
 import json
 import gpt_lib
 import logging
-# from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit
 
 # 配置openai的API Key
 gpt_lib.set_openai_key()
 # 初始化Flask
 app = Flask(__name__)
-# app.config['SECRET_KEY'] = 'secret!'
-# socketio = SocketIO(app)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
 
 logging.basicConfig(level=logging.DEBUG)
 # logging.disable()
