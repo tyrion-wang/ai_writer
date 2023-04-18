@@ -46,4 +46,4 @@ def handle_my_custom_event(data):
     emit('my response', data, broadcast=True)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app)
