@@ -1,2 +1,4 @@
 uwsgi --uid root --gid www-data --ini /var/www/ai_writer/app.ini
 sudo systemctl restart nginx
+sudo ln -s /etc/nginx/sites-available/ai_writer /etc/nginx/sites-enabled
+sudo ln -s /etc/nginx/sites-available/ai_writer_http /etc/nginx/sites-enabled
