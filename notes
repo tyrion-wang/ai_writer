@@ -1,0 +1,2 @@
+uwsgi --uid root --gid www-data --ini /var/www/ai_writer/app.ini
+sudo systemctl restart nginx

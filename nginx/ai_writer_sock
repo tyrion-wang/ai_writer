@@ -1,0 +1,18 @@
+server {
+    listen 80;
+    server_name www.3hwriter.com;
+
+    location / {
+        include uwsgi_params;
+        uwsgi_pass unix:/tmp/ai_writer.sock;
+    }
+
+    location /socket.io {
+        proxy_http_version 1.1;
+        proxy_buffering off;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        include uwsgi_params;
+        uwsgi_pass unix:/tmp/ai_writer.sock;
+    }
+}
