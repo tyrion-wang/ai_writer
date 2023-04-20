@@ -1,5 +1,10 @@
 uwsgi --uid root --gid www-data --ini /var/www/ai_writer/app.ini
 uwsgi --uid tyrion --gid www-data --ini /var/www/ai_writer/app.ini
+
 sudo systemctl restart nginx
+
 sudo ln -s /etc/nginx/sites-available/ai_writer /etc/nginx/sites-enabled
+rm -rf /etc/nginx/sites-enabled/ai_writer
+
 sudo ln -s /etc/nginx/sites-available/ai_writer_http /etc/nginx/sites-enabled
+rm -rf /etc/nginx/sites-enabled/ai_writer_http
