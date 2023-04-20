@@ -41,7 +41,6 @@ def transcribe():
     return jsonify({'transcription': transcription.strip()})
 
 
-
 @socketio.on('my event')
 def handle_my_custom_event(data):
     print('received data: ' + str(data))
