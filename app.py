@@ -6,14 +6,15 @@ import gpt_lib
 import logging
 from flask_socketio import SocketIO, emit
 import eventlet
-eventlet.monkey_patch()
+# eventlet.monkey_patch()
 
 # 配置openai的API Key
 gpt_lib.set_openai_key()
 # 初始化Flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, async_mode='eventlet')
+# socketio = SocketIO(app, async_mode='eventlet')
+socketio = SocketIO(app)
 
 logging.basicConfig(level=logging.DEBUG)
 # logging.disable()
@@ -22,6 +23,9 @@ logging.basicConfig(level=logging.DEBUG)
 @app.route('/')
 def index():
     return render_template('index.html')
+
+def test():
+    print('test')
 
 
 # 定义转写函数
@@ -47,4 +51,5 @@ def handle_my_custom_event(data):
     emit('my response', data, broadcast=True)
 
 if __name__ == '__main__':
-    socketio.run(app, host='127.0.0.1', port=5000, server='eventlet')
+    # socketio.run(app, host='127.0.0.1', port=5000, server='eventlet')
+    socketio.run(app)
