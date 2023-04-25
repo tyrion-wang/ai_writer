@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 import openai
 import os
 import json
@@ -7,6 +7,13 @@ import logging
 from flask_socketio import SocketIO, emit
 import eventlet
 # eventlet.monkey_patch()
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.vectorstores import Chroma
+from langchain import OpenAI
+
+import unstructured
+from dotenv import load_dotenv
+
 
 # 配置openai的API Key
 gpt_lib.set_openai_key()
@@ -18,6 +25,13 @@ socketio = SocketIO(app)
 
 logging.basicConfig(level=logging.DEBUG)
 # logging.disable()
+load_dotenv()
+
+embeddings = OpenAIEmbeddings(openai_api_key=os.environ['OPENAI_API_KEY'])
+# embeddings = OpenAIEmbeddings(openai_api_key=str(os.environ.get('OPENAI_API_KEY')))
+persist_directory = '/Users/bytedance/Downloads/database/'
+docsearch = Chroma(embedding_function=embeddings, persist_directory=persist_directory)
+
 
 # 定义首页
 @app.route('/')
@@ -49,6 +63,44 @@ def transcribe():
 def handle_my_custom_event(data):
     print('received data: ' + str(data))
     emit('my response', data, broadcast=True)
+
+
+def gen_prompt(docs, query) -> str:
+    return f"""To answer the question please only use the Context given, nothing else. Do not make up answer, simply say 'I don't know' if you are not sure.
+Question: {query}
+Context: {[doc.page_content for doc in docs]}
+Answer:
+"""
+
+def prompt(query):
+    # print(query)
+    # docs = docsearch.similarity_search(query, k=4)
+    # print(docs)
+    # prompt = gen_prompt(docs, query)
+    prompt = query
+    prompt = "今天天气如何？"
+    return prompt
+
+
+def stream(input_text):
+        completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[
+            {"role": "system", "content": "You're an assistant."},
+            {"role": "user", "content": f"{prompt(input_text)}"},
+        ], stream=True, max_tokens=500, temperature=0)
+        for line in completion:
+            if 'content' in line['choices'][0]['delta']:
+                yield line['choices'][0]['delta']['content']
+
+@app.route('/completion', methods=['GET', 'POST'])
+def completion_api():
+    # print("111")
+    # return "111222333"
+    if request.method == "POST":
+        data = request.form
+        input_text = data['input_text']
+        return Response(stream(input_text), mimetype='text/event-stream')
+    else:
+        return Response(None, mimetype='text/event-stream')
 
 if __name__ == '__main__':
     # socketio.run(app, host='127.0.0.1', port=5000, server='eventlet')
