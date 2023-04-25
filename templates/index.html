@@ -40,6 +40,7 @@
         </div>
         <div class="col-md-6 text-md-end mt-3 mt-md-0">
             <button type="button" class="btn btn-primary" onclick="transcribe()">转写</button>
+            <button type="button" class="btn btn-primary" onclick="test()">测试</button>
         </div>
     </div>
 
@@ -120,6 +121,39 @@
         document.body.removeChild(textarea);
     }
 </script>
+
+<form id="input-form" method="POST" class="d-flex">
+  <input type="text" name="input_text" maxlength="500" class="d-flex">
+</form>
+<div class="et-p" id="result">
+</div>
+
+<script>
+  var searchForm = document.getElementById('input-form');
+  searchForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      var formData = new FormData(searchForm);
+      formData.append('input_text', searchForm.elements.input_text.value);
+      try {
+          const response = await fetch('/completion', {
+              method: 'POST',
+              body: formData
+          });
+          const reader = response.body.getReader();
+          document.getElementById("result").innerHTML = "";
+          while (true) {
+              const {done, value} = await reader.read();
+              if (done) break;
+              const text = new TextDecoder().decode(value);
+              document.getElementById("result").innerHTML += text;
+          }
+      } catch (error) {
+          console.error(error);
+      }
+  });
+</script>
+
+
 
 </body>
 </html>
