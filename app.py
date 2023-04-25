@@ -4,9 +4,6 @@ import os
 import json
 import gpt_lib
 import logging
-from flask_socketio import SocketIO, emit
-# import eventlet
-# eventlet.monkey_patch()
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain import OpenAI
@@ -20,8 +17,6 @@ gpt_lib.set_openai_key()
 # 初始化Flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, async_mode='eventlet')
-# socketio = SocketIO(app)
 
 logging.basicConfig(level=logging.DEBUG)
 # logging.disable()
@@ -51,19 +46,12 @@ def transcribe():
     similarity = request.form['similarity']
     temperature = 1.0 - float(similarity) / 10.0
     #transcription = gpt_lib.chat(text, "围绕这个命题，生成一个800字的作文：", temperature)
-    # transcription = gpt_lib.chat(text, "总结这段文本，10个字以内：", temperature)
+    transcription = gpt_lib.chat(text, "总结这段文本，10个字以内：", temperature)
     #gpt_lib.chat_stream(text, "围绕这个命题，生成一个800字的作文：", temperature, socketio)
-    gpt_lib.chat_stream(text, "总结这段文本", temperature, socketio)
+    # gpt_lib.chat_stream(text, "总结这段文本", temperature, socketio)
     # transcription = "123"
     # 返回json格式的结果
-    # return jsonify({'transcription': transcription.strip()})
-
-
-@socketio.on('my event')
-def handle_my_custom_event(data):
-    print('received data: ' + str(data))
-    emit('my response', data, broadcast=True)
-
+    return jsonify({'transcription': transcription.strip()})
 
 def gen_prompt(docs, query) -> str:
     return f"""To answer the question please only use the Context given, nothing else. Do not make up answer, simply say 'I don't know' if you are not sure.
@@ -104,5 +92,3 @@ def completion_api():
 
 if __name__ == '__main__':
     app.run(debug=True)
-    # socketio.run(app, host='127.0.0.1', port=5000, server='eventlet')
-    # socketio.run(app)
