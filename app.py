@@ -11,7 +11,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain import OpenAI
 
-import unstructured
+# import unstructured
 from dotenv import load_dotenv
 
 
