@@ -65,8 +65,8 @@ def prompt(query):
     # docs = docsearch.similarity_search(query, k=4)
     # print(docs)
     # prompt = gen_prompt(docs, query)
-    prompt = query
-    prompt = "今天天气如何？"
+    # prompt = query
+    prompt = "写一篇2000字的关于气候变暖的论文。"
     return prompt
 
 
@@ -74,7 +74,7 @@ def stream(input_text):
         completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[
             {"role": "system", "content": "You're an assistant."},
             {"role": "user", "content": f"{prompt(input_text)}"},
-        ], stream=True, max_tokens=500, temperature=0)
+        ], stream=True, max_tokens=4000, temperature=0)
         for line in completion:
             if 'content' in line['choices'][0]['delta']:
                 yield line['choices'][0]['delta']['content']
