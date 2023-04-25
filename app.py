@@ -5,7 +5,7 @@ import json
 import gpt_lib
 import logging
 from flask_socketio import SocketIO, emit
-import eventlet
+# import eventlet
 # eventlet.monkey_patch()
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
