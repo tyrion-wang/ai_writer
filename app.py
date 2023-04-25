@@ -23,7 +23,6 @@ logging.basicConfig(level=logging.DEBUG)
 def index():
     return render_template('index.html')
 
-
 # 定义转写函数
 @app.route('/transcribe', methods=['POST'])
 def transcribe():
@@ -48,3 +47,4 @@ def handle_my_custom_event(data):
 
 if __name__ == '__main__':
     socketio.run(app, host='127.0.0.1', port=5000, server='eventlet')
+    socketio.emit('my response', "123")
