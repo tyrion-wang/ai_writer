@@ -4,7 +4,6 @@ import os
 import json
 import gpt_lib
 import logging
-import openai
 from flask_socketio import SocketIO, emit
 # import eventlet
 # eventlet.monkey_patch()
@@ -15,8 +14,9 @@ from langchain import OpenAI
 # import unstructured
 from dotenv import load_dotenv
 
-
-
+# 配置openai的API Key
+gpt_lib.set_openai_key()
+print(os.environ.get('OPENAI_API_KEY'))
 # 初始化Flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -36,9 +36,6 @@ load_dotenv()
 def index():
     return render_template('index.html')
 
-def test():
-    print('test')
-
 
 # 定义转写函数
 @app.route('/transcribe', methods=['POST'])
@@ -51,10 +48,14 @@ def transcribe():
     #transcription = gpt_lib.chat(text, "围绕这个命题，生成一个800字的作文：", temperature)
     transcription = gpt_lib.chat(text, "总结这段文本，10个字以内：", temperature)
     #gpt_lib.chat_stream(text, "围绕这个命题，生成一个800字的作文：", temperature, socketio)
-    gpt_lib.chat_stream(text, "总结这段文本", temperature, socketio)
+    # gpt_lib.chat_stream(text, "总结这段文本", temperature, socketio)
     # transcription = "123"
     # 返回json格式的结果
     return jsonify({'transcription': transcription.strip()})
+
+# @app.route('/write', methods=['GET', 'POST'])
+# def write():
+#     print("write")
 
 def gen_prompt(docs, query) -> str:
     return f"""To answer the question please only use the Context given, nothing else. Do not make up answer, simply say 'I don't know' if you are not sure.

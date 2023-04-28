@@ -40,7 +40,7 @@
         </div>
         <div class="col-md-6 text-md-end mt-3 mt-md-0">
             <button type="button" class="btn btn-primary" onclick="transcribe()">转写</button>
-            <button type="button" class="btn btn-primary" onclick="test()">测试</button>
+            <button type="button" class="btn btn-primary" onclick="ai_write()">Write</button>
         </div>
     </div>
 
@@ -125,12 +125,12 @@
               body: formData
           });
           const reader = response.body.getReader();
-          document.getElementById("result").innerHTML = "";
+          document.getElementById("transcription").innerHTML = "";
           while (true) {
               const {done, value} = await reader.read();
               if (done) break;
               const text = new TextDecoder().decode(value);
-              document.getElementById("result").innerHTML += text;
+              document.getElementById("transcription").innerHTML += text;
           }
       } catch (error) {
           console.error(error);
