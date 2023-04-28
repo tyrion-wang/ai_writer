@@ -20,12 +20,6 @@ from dotenv import load_dotenv
 # 初始化Flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-# socketio = SocketIO(app, async_mode='eventlet')
-# socketio = SocketIO(app)
-# 配置openai的API Key
-# gpt_lib.set_openai_key()
-openai.api_key = os.environ.get('OPENAI_API_KEY')
-os.environ['OPENAI_API_KEY'] = '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'
 
 logging.basicConfig(level=logging.DEBUG)
 # logging.disable()
@@ -55,19 +49,12 @@ def transcribe():
     similarity = request.form['similarity']
     temperature = 1.0 - float(similarity) / 10.0
     #transcription = gpt_lib.chat(text, "围绕这个命题，生成一个800字的作文：", temperature)
-    # transcription = gpt_lib.chat(text, "总结这段文本，10个字以内：", temperature)
+    transcription = gpt_lib.chat(text, "总结这段文本，10个字以内：", temperature)
     #gpt_lib.chat_stream(text, "围绕这个命题，生成一个800字的作文：", temperature, socketio)
-    # gpt_lib.chat_stream(text, "总结这段文本", temperature, socketio)
+    gpt_lib.chat_stream(text, "总结这段文本", temperature, socketio)
     # transcription = "123"
     # 返回json格式的结果
-    # return jsonify({'transcription': transcription.strip()})
-
-
-# @socketio.on('my event')
-# def handle_my_custom_event(data):
-#     print('received data: ' + str(data))
-#     emit('my response', data, broadcast=True)
-
+    return jsonify({'transcription': transcription.strip()})
 
 def gen_prompt(docs, query) -> str:
     return f"""To answer the question please only use the Context given, nothing else. Do not make up answer, simply say 'I don't know' if you are not sure.
@@ -81,8 +68,8 @@ def prompt(query):
     # docs = docsearch.similarity_search(query, k=4)
     # print(docs)
     # prompt = gen_prompt(docs, query)
-    prompt = query
-    prompt = "今天天气如何？"
+    # prompt = query
+    prompt = "写一篇2000字的关于气候变暖的论文。"
     return prompt
 
 
@@ -90,7 +77,7 @@ def stream(input_text):
         completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[
             {"role": "system", "content": "You're an assistant."},
             {"role": "user", "content": f"{prompt(input_text)}"},
-        ], stream=True, max_tokens=500, temperature=0)
+        ], stream=True, max_tokens=4000, temperature=0)
         for line in completion:
             if 'content' in line['choices'][0]['delta']:
                 yield line['choices'][0]['delta']['content']
@@ -108,5 +95,3 @@ def completion_api():
 
 if __name__ == '__main__':
     app.run(debug=True)
-    # socketio.run(app, host='127.0.0.1', port=5000, server='eventlet')
-    # socketio.run(app)
