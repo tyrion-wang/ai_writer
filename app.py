@@ -86,7 +86,7 @@ def stream(input_text):
 @app.route('/completion', methods=['GET', 'POST'])
 def completion_api():
     # print("111")
-    # return "111222333"
+    # return "test return"
     if request.method == "POST":
         data = request.form
         input_text = data['input_text']
