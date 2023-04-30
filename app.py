@@ -70,7 +70,7 @@ def prompt(query):
     # print(docs)
     # prompt = gen_prompt(docs, query)
     # prompt = query
-    prompt = "写一篇2000字的关于气候变暖的论文。"
+    prompt = "写一篇2000字的关于气候变暖的论文"
     return prompt
 
 
