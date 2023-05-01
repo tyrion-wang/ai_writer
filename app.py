@@ -101,7 +101,7 @@ import requests
 STREAM_FLAG = True  # 是否开启流式推送
 CHAT_CONTEXT_NUMBER_MAX = 12
 # API_KEY = os.environ.get('OPENAI_API_KEY')
-API_KEY = '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'
+API_KEY = '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'
 def check_session(current_session):
     """
     检查session，如果不存在则创建新的session
